@@ -31,7 +31,7 @@ class Calculation:
 response = {"results": "", "result_type": "", "id": ""}
 
 # メソッド名と実際のメソッドの対応
-hashmap = {
+method_hashmap = {
     "floor": Calculation.floor,
     "nroot": Calculation.nroot,
     "reverse": Calculation.reverse,
@@ -89,7 +89,17 @@ def main():
                     params = receivedData["params"]
                     id = receivedData["id"]
 
+                    # まず引数をメソッドに合う形に変換
+                    if method == "floor":
+                        params = [float(param) for param in params]
+                    elif method == "nroot":
+                        params = [int(param) for param in params]
+                    else:
+                        params = [str(param) for param in params]
+
+                    print(params)
                     # 指定されたメソッドを使用してレスポンスを作成してクライアントに返却
+                    # answer=method_hashmap[method](params)
 
                 # クライアントからデータが送られてこなければ、ループを終了します。
                 else:
