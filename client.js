@@ -5,7 +5,7 @@ const net = require("net");
 const client = new net.Socket();
 
 // サーバが待ち受けている特定の場所にソケットを接続します。
-const server_address = "/socket_file"; // サンプルとしてローカルホストを使用
+const server_address = "./socket_file"; // サンプルとしてローカルホストを使用
 
 const requestData = {
   method: "",
