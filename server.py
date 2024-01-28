@@ -27,20 +27,19 @@ class Calculation:
         return sorted(strArr)
 
 
-# レスポンスの基本型
-response = {"results": "", "result_type": "", "id": ""}
-
-# メソッド名と実際のメソッドの対応
-method_hashmap = {
-    "floor": Calculation.floor,
-    "nroot": Calculation.nroot,
-    "reverse": Calculation.reverse,
-    "validAnagram": Calculation.validAnagram,
-    "sort": Calculation.sort,
-}
-
-
 def main():
+    # Calculationクラスのインスタンスを作成
+    calculation_instance = Calculation()
+
+    # メソッド名とインスタンスメソッドの対応
+    method_hashmap = {
+        "floor": calculation_instance.floor,
+        "nroot": calculation_instance.nroot,
+        "reverse": calculation_instance.reverse,
+        "validAnagram": calculation_instance.validAnagram,
+        "sort": calculation_instance.sort,
+    }
+
     # # UNIXソケットをストリームモードで作成します
     sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
 
@@ -99,7 +98,16 @@ def main():
 
                     print(params)
                     # 指定されたメソッドを使用してレスポンスを作成してクライアントに返却
-                    # answer=method_hashmap[method](params)
+                    answer = method_hashmap[method](*params)
+                    print(answer)
+                    result_type = str(type(answer)).split("'")[1]
+                    print(result_type)
+
+                    # レスポンスの基本型
+                    response = {"results": answer, "result_type": result_type, "id": id}
+
+                    print("answer data: {}".format(response))
+                    connection.send(json.dumps(response).encode())
 
                 # クライアントからデータが送られてこなければ、ループを終了します。
                 else:
