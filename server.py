@@ -76,39 +76,52 @@ def main():
                 if data:
                     # 受け取ったデータはバイナリ形式なので、それを文字列に変換します。
                     # 'utf-8'は文字列のエンコーディング方式です。
-                    data_str = data.decode("utf-8")
 
-                    print("Received data: {}".format(data_str))
+                    try:
+                        data_str = data.decode("utf-8")
 
-                    receivedData = json.loads(data)
+                        print("Received data: {}".format(data_str))
 
-                    print(receivedData)
-                    # もしデータがあれば（つまりクライアントから何かメッセージが送られてきたら）以下の処理をします。
-                    method = receivedData["method"]
-                    params = receivedData["params"]
-                    id = receivedData["id"]
+                        receivedData = json.loads(data)
 
-                    # まず引数をメソッドに合う形に変換
-                    if method == "floor":
-                        params = [float(param) for param in params]
-                    elif method == "nroot":
-                        params = [int(param) for param in params]
-                    else:
-                        params = [str(param) for param in params]
+                        print(receivedData)
+                        # もしデータがあれば（つまりクライアントから何かメッセージが送られてきたら）以下の処理をします。
+                        method = receivedData["method"]
+                        params = receivedData["params"]
+                        id = receivedData["id"]
 
-                    print(params)
-                    # 指定されたメソッドを使用してレスポンスを作成してクライアントに返却
-                    answer = method_hashmap[method](*params)
-                    print(answer)
-                    result_type = str(type(answer)).split("'")[1]
-                    print(result_type)
+                        # まず引数をメソッドに合う形に変換
+                        if method == "floor":
+                            params = [float(param) for param in params]
+                        elif method == "nroot":
+                            params = [int(param) for param in params]
+                        else:
+                            params = [str(param) for param in params]
 
-                    # レスポンスの基本型
-                    response = {"results": answer, "result_type": result_type, "id": id}
+                        print(params)
 
-                    print("answer data: {}".format(response))
+                        try:
+                            # 指定されたメソッドを使用してレスポンスを作成してクライアントに返却
+                            answer = method_hashmap[method](*params)
+                            print(answer)
+                            result_type = str(type(answer)).split("'")[1]
+                            print(result_type)
+
+                            # レスポンスの基本型
+                            response = {
+                                "results": answer,
+                                "result_type": result_type,
+                                "id": id,
+                            }
+
+                            print("answer data: {}".format(response))
+                        except Exception as e:
+                            response = {"error": str(e), "id": id}
+
+                    except json.JSONDecodeError:
+                        response = {"error": "Invalid JSON format", "id": None}
+
                     connection.send(json.dumps(response).encode())
-
                 # クライアントからデータが送られてこなければ、ループを終了します。
                 else:
                     print("no data from", client_address)
