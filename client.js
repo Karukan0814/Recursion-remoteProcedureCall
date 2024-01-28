@@ -10,7 +10,6 @@ const server_address = "./socket_file"; // サンプルとしてローカルホ�
 const requestData = {
   method: "",
   params: [],
-  param_types: [],
   id: 0,
 };
 
