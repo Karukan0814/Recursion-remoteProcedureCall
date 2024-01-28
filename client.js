@@ -14,44 +14,107 @@ const requestData = {
   id: 0,
 };
 
+const methodList = ["floor", "nroot", "reverse", "validAnagram", "sort"];
+
 // コマンドラインからユーザーの入力を受け取る
 const readline = require("readline");
-
-function main() {
-  // まず、ユーザーに呼び出したいメソッド、渡すパラメータと型を聞く
-  //   メソッド名
-  const rl1 = readline.createInterface({
+function question(query) {
+  const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
   });
 
-  rl1.question("What method?", (method) => {
-    console.log(method);
+  return new Promise((resolve) => {
+    rl.question(query, (answer) => {
+      rl.close();
+      resolve(answer);
+    });
+  });
+}
+
+// 数値か確認する関数
+function isNumericString(str) {
+  const num = Number(str);
+  return !isNaN(num) && str === num.toString();
+}
+
+// パラメータの入力チェック関数
+function validateParams(method, params) {
+  if (!Array.isArray(params)) {
+    return false;
+  }
+  if (method == "floor") {
+    return params.length == 1 && isNumericString(params[0]);
+  } else if (method == "nroot") {
+    return (
+      params.length === 2 && params.every((param) => isNumericString(param))
+    );
+  } else if (method == "reverse" || method == "sort") {
+    return params.length === 1;
+  } else if (method == "validAnagram") {
+    return params.length === 2;
+  }
+}
+
+async function main() {
+  // まず、ユーザーに呼び出したいメソッド、渡すパラメータを聞く
+
+  while (true) {
+    const id = await question("Input ID: ");
+
+    // 数値に変換し、数値であるかどうかをチェック
+    requestData.id = Number(id);
+    if (!isNaN(requestData.id)) {
+      // 有効な数値が入力された場合はループを抜ける
+      break;
+    } else {
+      console.log("Please input id as number");
+    }
+  }
+  while (true) {
+    const method = await question("What method is required?");
+
     requestData.method = method;
-    rl1.close(); // readline インターフェースを閉じる
-  });
+    if (methodList.includes(method)) {
+      // 有効なメソッドが入力された場合はループをに抜ける
+      break;
+    } else {
+      console.log("Please input a method existing");
+    }
+  }
 
-  //   パラメータ
-  const rl2 = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-  });
+  while (true) {
+    const paramsStr = await question("Input params");
 
-  rl2.question("Input parameters", (params) => {
-    console.log(params);
-    requestData.params = params.split(" ");
-    rl2.close(); // readline インターフェースを閉じる
-  });
+    const params = paramsStr.split(" ");
 
-  requestData.id += 1;
+    if (validateParams(params)) {
+      // 有効なメソッドが入力された場合はループをに抜ける
+      requestData.params = params;
+      break;
+    } else {
+      console.log("Please input valid params.");
+    }
+  }
+
+  while (true) {
+    const id = await question("Input id");
+
+    if (isNumericString(id)) {
+      // 有効なidが入力された場合はループをに抜ける
+      requestData.id = id;
+      break;
+    } else {
+      console.log("Please input id as number.");
+    }
+  }
 
   // サーバに接続を試みます。
   client.connect(server_address, () => {
     console.log("Connected to server");
-
-    // サーバにメッセージを送信します。
-    const message = "Sending a message to the server side";
-    client.write(message);
+    console.log({ requestData });
+    // サーバにリクエストデータを送信します。
+    client.write(JSON.stringify(requestData));
   });
 
   // ソケットからのデータを受信した際のイベントハンドラ

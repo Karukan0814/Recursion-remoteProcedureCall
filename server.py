@@ -1,6 +1,7 @@
 # socketとosモジュールをインポートします
 import socket
 import os
+import json
 
 
 # クライアント側に提供するメソッドをまとめたクラス
@@ -27,7 +28,16 @@ class Calculation:
 
 
 # レスポンスの基本型
-response = {"results": "", "result_type": "", "id": 0}
+response = {"results": "", "result_type": "", "id": ""}
+
+# メソッド名と実際のメソッドの対応
+hashmap = {
+    "floor": Calculation.floor,
+    "nroot": Calculation.nroot,
+    "reverse": Calculation.reverse,
+    "validAnagram": Calculation.flvalidAnagramoor,
+    "sort": Calculation.sort,
+}
 
 
 def main():
@@ -62,24 +72,24 @@ def main():
             # ループが始まります。これは、サーバが新しいデータを待ち続けるためのものです。
             while True:
                 # ここでサーバは接続からデータを読み込みます。
-                # 16という数字は、一度に読み込むデータの最大バイト数です。
-                data = connection.recv(16)
+                data = connection.recv(1024)
 
-                # 受け取ったデータはバイナリ形式なので、それを文字列に変換します。
-                # 'utf-8'は文字列のエンコーディング方式です。
-                data_str = data.decode("utf-8")
-
-                # 受け取ったデータを表示します。
-                print("Received " + data_str)
-
-                # もしデータがあれば（つまりクライアントから何かメッセージが送られてきたら）以下の処理をします。
                 if data:
-                    # 受け取ったメッセージを処理します。
-                    response = "Processing " + data_str
+                    # 受け取ったデータはバイナリ形式なので、それを文字列に変換します。
+                    # 'utf-8'は文字列のエンコーディング方式です。
+                    data_str = data.decode("utf-8")
 
-                    # 処理したメッセージをクライアントに送り返します。
-                    # ここでメッセージをバイナリ形式（エンコード）に戻してから送信します。
-                    connection.sendall(response.encode())
+                    print("Received data: {}".format(data_str))
+
+                    receivedData = json.loads(data)
+
+                    print(receivedData)
+                    # もしデータがあれば（つまりクライアントから何かメッセージが送られてきたら）以下の処理をします。
+                    method = receivedData["method"]
+                    params = receivedData["params"]
+                    id = receivedData["id"]
+
+                    # 指定されたメソッドを使用してレスポンスを作成してクライアントに返却
 
                 # クライアントからデータが送られてこなければ、ループを終了します。
                 else:
