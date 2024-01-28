@@ -102,7 +102,12 @@ def main():
 
                         try:
                             # 指定されたメソッドを使用してレスポンスを作成してクライアントに返却
-                            answer = method_hashmap[method](*params)
+                            answer = None
+                            if method == "sort":
+                                answer = method_hashmap[method](params)
+                            else:
+                                answer = method_hashmap[method](*params)
+
                             print(answer)
                             result_type = str(type(answer)).split("'")[1]
                             print(result_type)
