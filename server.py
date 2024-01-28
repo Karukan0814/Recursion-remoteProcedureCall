@@ -35,17 +35,17 @@ hashmap = {
     "floor": Calculation.floor,
     "nroot": Calculation.nroot,
     "reverse": Calculation.reverse,
-    "validAnagram": Calculation.flvalidAnagramoor,
+    "validAnagram": Calculation.validAnagram,
     "sort": Calculation.sort,
 }
 
 
 def main():
     # # UNIXソケットをストリームモードで作成します
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
 
     # # このサーバが接続を待つUNIXソケットのパスを設定します
-    server_address = "/socket_file"
+    server_address = "./socket_file"
 
     # # 以前の接続が残っていた場合に備えて、サーバアドレスをアンリンク（削除）します
     try:

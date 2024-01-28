@@ -34,16 +34,21 @@ function question(query) {
 
 // 数値か確認する関数
 function isNumericString(str) {
+  console.log("str", str);
   const num = Number(str);
   return !isNaN(num) && str === num.toString();
 }
 
 // パラメータの入力チェック関数
 function validateParams(method, params) {
+  console.log("method", method);
+
+  console.log("params", params);
   if (!Array.isArray(params)) {
     return false;
   }
   if (method == "floor") {
+    console.log(isNumericString(params[0]));
     return params.length == 1 && isNumericString(params[0]);
   } else if (method == "nroot") {
     return (
@@ -88,24 +93,12 @@ async function main() {
 
     const params = paramsStr.split(" ");
 
-    if (validateParams(params)) {
+    if (validateParams(requestData.method, params)) {
       // 有効なメソッドが入力された場合はループをに抜ける
       requestData.params = params;
       break;
     } else {
       console.log("Please input valid params.");
-    }
-  }
-
-  while (true) {
-    const id = await question("Input id");
-
-    if (isNumericString(id)) {
-      // 有効なidが入力された場合はループをに抜ける
-      requestData.id = id;
-      break;
-    } else {
-      console.log("Please input id as number.");
     }
   }
 
