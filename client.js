@@ -53,10 +53,14 @@ function validateParams(method, params) {
     return (
       params.length === 2 && params.every((param) => isNumericString(param))
     );
-  } else if (method == "reverse" || method == "sort") {
+  } else if (method == "reverse") {
     return params.length === 1;
   } else if (method == "validAnagram") {
     return params.length === 2;
+  } else if (method == "sort") {
+    return params.length >= 1;
+  } else {
+    return false;
   }
 }
 
